@@ -10,6 +10,7 @@ class PowerSlot:
     park_name: str
     timestamp: datetime
     mw: float
+    energy_type: EnergyType
 
 @dataclass
 class ParkInfo:
