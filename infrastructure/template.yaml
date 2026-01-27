@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Power Aggregator API
+
+Resources:
+  PowerApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.11
+      Handler: lambda/handler.lambda_handler
+      Environment:
+        Variables:
+          POWER_TABLE_NAME: PowerTable
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBReadPolicy:
+            TableName: PowerTable
+      Events:
+        GetPowerData:
+          Type: Api
+          Properties:
+            Path: /power
+            Method: post
+
+Outputs:
+  PowerApiUrl:
+    Description: "API Gateway endpoint URL for Power Aggregator"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/power"
