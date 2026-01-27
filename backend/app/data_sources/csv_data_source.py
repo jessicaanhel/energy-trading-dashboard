@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime
-from pathlib import Path
 from typing import List
 
 from backend.app.data_sources.power_data_source import PowerDataSource
@@ -9,13 +8,13 @@ from backend.app.utils.timezone import local_to_utc
 
 
 class CsvDataSource(PowerDataSource):
-    def __init__(self, data_dir: Path):
-        self.data_dir = data_dir
+    def __init__(self):
+        self.data_dir = "data/park_info.csv"
         self._parks = self._load_parks()
 
     def _load_parks(self) -> dict[str, ParkInfo]:
         parks = {}
-        with open(self.data_dir / "parks.csv") as f:
+        with open(self.data_dir) as f:
             reader = csv.DictReader(f)
             for row in reader:
                 parks[row["park_name"]] = ParkInfo(
@@ -32,7 +31,7 @@ class CsvDataSource(PowerDataSource):
         slots = []
 
         for park_name, park in self._parks.items():
-            path = self.data_dir / f"{park_name}.csv"
+            path = f"{park_name}.csv"
             if not path.exists():
                 continue
 
