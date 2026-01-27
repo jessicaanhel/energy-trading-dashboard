@@ -1,29 +1,17 @@
-from typing import List
 from datetime import datetime
-from backend.app.models.power import PowerSlot
-from backend.app.data_sources.csv_data_source import load_power_csv, load_parks_metadata
-from timezone import local_to_utc
-from aggregations import average_mw_per_hour, total_mw_by_energy_type
+from typing import Dict
+from backend.app.data_sources.power_data_source import PowerDataSource
+from aggregator import Aggregator
 
 class PowerDataService:
-    def __init__(self, metadata_path: str):
-        self.metadata = load_parks_metadata(metadata_path)
-        self.records: List[PowerSlot] = []
+    def __init__(self, data_source: PowerDataSource):
+        self.data_source = data_source
+        self.parks = data_source.load_parks()
 
-    def load_all_records(self):
-        self.records.clear()
-        for park_name, meta in self.metadata.items():
-            csv_records = load_power_csv(f"{park_name}.csv", park_name)
-            for r in csv_records:
-                r.timestamp = local_to_utc(r.timestamp, meta['timezone'])
-            self.records.extend(csv_records)
-
-    def get_records(self, start: datetime, end: datetime) -> List[PowerSlot]:
-        return [r for r in self.records if start <= r.timestamp <= end]
-
-    def get_aggregations(self, start: datetime, end: datetime):
-        filtered = self.get_records(start, end)
+    def get_aggregations(self, start: datetime, end: datetime) -> Dict:
+        slots = self.data_source.load_slots(start, end)
         return {
-            "average_per_hour": average_mw_per_hour(filtered),
-            "total_by_energy_type": total_mw_by_energy_type(filtered, self.metadata)
+            "average_per_hour": Aggregator.average_mw_per_hour(slots),
+            "total_per_hour": Aggregator.total_mw_per_hour(slots),
+            "total_by_energy_type": Aggregator.total_mw_by_energy_type(slots, self.parks)
         }
