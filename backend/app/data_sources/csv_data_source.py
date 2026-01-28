@@ -1,52 +1,47 @@
 import csv
+import os
 from datetime import datetime
 from typing import List
 
 from backend.app.data_sources.power_data_source import PowerDataSource
-from backend.app.models.power import ParkInfo, EnergyType, PowerSlot
-from backend.app.utils.timezone import local_to_utc
+from backend.app.models.power import PowerSlot, ParkInfo, EnergyType
 
 
 class CsvDataSource(PowerDataSource):
-    def __init__(self):
-        self.data_dir = "data/park_info.csv"
-        self._parks = self._load_parks()
-
-    def _load_parks(self) -> dict[str, ParkInfo]:
-        parks = {}
-        with open(self.data_dir) as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                parks[row["park_name"]] = ParkInfo(
-                    name=row["park_name"],
-                    timezone=row["timezone"],
-                    energy_type=EnergyType(row["energy_type"])
-                )
-        return parks
+    def __init__(self, data_dir: str):
+        self.data_dir = data_dir
+        self.parks = self.load_parks()
 
     def load_parks(self) -> List[ParkInfo]:
-        return list(self._parks.values())
+        parks = []
+        with open(os.path.join(self.data_dir, "park_info.csv")) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                parks.append(ParkInfo(
+                    park_name=row["park_name"],
+                    timezone=row["timezone"],
+                    energy_type=EnergyType(row["energy_type"])
+                ))
+        return parks
 
     def load_slots(self, start: datetime, end: datetime) -> List[PowerSlot]:
+        park_map = {p.park_name: p for p in self.parks}
         slots = []
 
-        for park_name, park in self._parks.items():
-            path = f"{park_name}.csv"
-            if not path.exists():
+        for file_name in os.listdir(self.data_dir):
+            if not file_name.endswith(".csv") or file_name == "park_info.csv":
                 continue
-
-            with open(path) as f:
+            park_name = file_name.replace(".csv", "")
+            park = park_map[park_name]
+            with open(os.path.join(self.data_dir, file_name)) as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    local_dt = datetime.fromisoformat(row["datetime"])
-                    utc_dt = local_to_utc(local_dt, park.timezone)
-
-                    if start <= utc_dt <= end:
-                        slots.append(
-                            PowerSlot(
-                                park_name=park_name,
-                                timestamp_utc=utc_dt,
-                                mw=float(row["MW"])
-                            )
-                        )
+                    ts = datetime.fromisoformat(row["datetime"])
+                    if start <= ts <= end:
+                        slots.append(PowerSlot(
+                            park_name=park_name,
+                            timestamp=ts,
+                            mw=float(row["MW"]),
+                            energy_type=park.energy_type
+                        ))
         return slots

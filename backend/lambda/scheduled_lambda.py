@@ -9,10 +9,14 @@ def lambda_handler(event, context):
     table_name = os.environ["POWER_TABLE_NAME"]
     agg_table = os.environ["AGG_TABLE_NAME"]
 
+    body = json.loads(event["body"])
+    start = body["start"]
+    end = body["end"]
+
     data_source = DynamoDataSource(table_name)
     service = PowerDataService(data_source)
 
-    slots = service.get_all_slots()
+    slots = service.get_slots(start, end)
 
     avg_agg = Aggregator.average_mw_per_hour(slots)
     total_agg = Aggregator.total_mw_by_energy_type(slots)

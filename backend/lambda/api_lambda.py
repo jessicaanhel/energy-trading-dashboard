@@ -2,6 +2,8 @@ import os
 import json
 from datetime import datetime
 from typing import List
+
+from backend.app.data_sources.sync_csv_to_dynamo import run_csv_sync
 from backend.app.models.power import PowerSlot, PowerRequest
 from backend.app.data_sources.dynamo_data_source import DynamoDataSource
 from backend.app.services.power_service import PowerDataService
@@ -21,6 +23,7 @@ def lambda_handler(event, context):
     }
     """
     try:
+        run_csv_sync()
         body = json.loads(event["body"])
         req = PowerRequest(
             start=body["start"],
