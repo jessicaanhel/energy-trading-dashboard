@@ -2,6 +2,25 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Power Aggregator API
 
+Globals:
+  Api:
+    Auth:
+      DefaultAuthorizer: AWS_IAM
+
+Parameters:
+  Stage:
+    Type: String
+    Description: Deployment stage (dev, prod)
+
+  AppName:
+    Type: String
+    Default: Trading Dashboard
+
+  GitHubApiUser:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: Github user with permissions to trigger builds
+    Default: /config/trading-dashboard/github-user
+
 Resources:
   PowerApiFunction:
     Type: AWS::Serverless::Function
@@ -10,6 +29,7 @@ Resources:
       Handler: lambda/handler.lambda_handler
       Environment:
         Variables:
+          STAGE: !Ref Stage
           POWER_TABLE_NAME: PowerTable
       Policies:
         - AWSLambdaBasicExecutionRole

@@ -1,0 +1,28 @@
+version = 0.1
+
+[dev]
+[dev.deploy]
+[dev.deploy.parameters]
+stack_name = "trading-dashboard-dev"
+s3_bucket = "trading-dashboard"
+s3_prefix = "dev"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Stage=\"dev\" AppName=\"Trading-Dashboard\" GitHubApiUser=\"/config/trading-dashboard/github-user\""
+image_repositories = []
+disable_rollback = true
+
+
+[prod]
+[prod.deploy]
+[prod.deploy.parameters]
+stack_name = "trading-dashboard"
+s3_bucket = "trading-dashboard"
+s3_prefix = "prod"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Stage=\"prod\" AppName=\"Trading-Dashboard\" GitHubApiUser=\"/config/trading-dashboard/github-user\""
+image_repositories = []
+disable_rollback = true
