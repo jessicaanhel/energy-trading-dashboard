@@ -47,18 +47,22 @@ The architecture is designed to be scalable, maintainable, and cost-efficient.
 ---
 ## Run App
 
-`uvicorn backend.app.api.local_api:app --reload --port 3001`
+```
+uvicorn backend.app.api.local_api:app --reload --port 3001
+```
 &
-`cd frontend
-frontend npm run dev`
+```
+cd frontend
+frontend npm run dev
+```
 ---
 
 ## Project Structure
 
-backend/ # Python backend and data processing
-frontend/ # React application
-infrastructure/ # Architecture and deployment documentation
-data/ # Sample CSV files
+* backend/ # Python backend and data processing
+* frontend/ # React application
+* infrastructure/ # Architecture and deployment documentation
+* data/ # Sample CSV files
 
 ---
 
