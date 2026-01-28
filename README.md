@@ -48,7 +48,7 @@ The architecture is designed to be scalable, maintainable, and cost-efficient.
 ## Run App
 
 ```
-uvicorn backend.app.api.local_api:app --reload --port 3001
+uvicorn backend.app.main:app --reload --port 3001
 ```
 &
 ```

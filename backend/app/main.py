@@ -1,18 +1,19 @@
-from datetime import datetime
-from backend.app.data_sources.csv_data_source import CsvDataSource
-from backend.app.services.power_service import PowerDataService
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from backend.app.api.power import router as power_router
 
-def main():
-    data_source = CsvDataSource()
+app = FastAPI(title="Power Trading API (Local CSV)")
 
-    service = PowerDataService(data_source)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    result = service.get_aggregations(
-        start=datetime(2020, 1, 1),
-        end=datetime(2020, 12, 31)
-    )
-
-    print(result)
+app.include_router(power_router)
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    uvicorn.run("backend.app.main:app", host="127.0.0.1", port=3001, reload=True)
