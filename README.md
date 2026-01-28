@@ -33,7 +33,7 @@ The architecture is designed to be scalable, maintainable, and cost-efficient.
 - React
 - TypeScript
 - Vite
-- Recharts
+- Chart.js
 
 ---
 
@@ -44,6 +44,13 @@ The architecture is designed to be scalable, maintainable, and cost-efficient.
 - Time range and date filtering
 - Interactive charts and tables
 
+---
+## Run App
+
+`uvicorn backend.app.api.local_api:app --reload --port 3001`
+&
+`cd frontend
+frontend npm run dev`
 ---
 
 ## Project Structure

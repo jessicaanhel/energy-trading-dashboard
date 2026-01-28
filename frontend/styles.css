@@ -1,0 +1,18 @@
+body {
+  font-family: system-ui, sans-serif;
+  padding: 24px;
+}
+
+select, input {
+  margin-right: 12px;
+}
+
+table {
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+td, th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
