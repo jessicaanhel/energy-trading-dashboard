@@ -43,6 +43,8 @@ def get_power_data(request: PowerRequest, power_service: PowerDataService = Depe
     """Handle internal APi request from frontend. Return ready for visualization data"""
     start_datetime = parse_iso_datetime(request.start)
     end_datetime = parse_iso_datetime(request.end)
+    if end_datetime < start_datetime:
+        raise HTTPException(status_code=400, detail="Start date must be before end date")
 
     power_slots = power_service.get_slots(start_datetime, end_datetime)
     filtered_slots = filter_slots_by_park(power_slots, request.park)
