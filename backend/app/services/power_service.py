@@ -1,6 +1,6 @@
 from datetime import datetime
 from backend.app.data_sources.power_data_source import PowerDataSource
-from backend.app.models.power import PowerSlot
+from backend.app.models.domain import PowerSlot
 
 
 class PowerDataService:

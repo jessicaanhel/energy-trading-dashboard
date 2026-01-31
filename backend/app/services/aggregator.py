@@ -1,6 +1,6 @@
 from collections import defaultdict
 from typing import List, Dict
-from backend.app.models.power import PowerSlot
+from backend.app.models.domain import PowerSlot
 
 
 class Aggregator:
