@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List
 
 from backend.app.data_sources.power_data_source import PowerDataSource
-from backend.app.models.power import PowerSlot, ParkInfo, EnergyType
+from backend.app.models.domain import PowerSlot, ParkInfo, EnergyType
 
 
 class CsvDataSource(PowerDataSource):
