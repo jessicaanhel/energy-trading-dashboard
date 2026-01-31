@@ -21,4 +21,3 @@ class ParkInfo:
     park_name: str
     energy_type: EnergyType
     timezone: str
-
