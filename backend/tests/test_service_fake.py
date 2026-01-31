@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import List
 import pytest
 
-from backend.app.models.power import ParkInfo, PowerSlot
+from backend.app.models.domain import ParkInfo, PowerSlot
 from backend.app.data_sources.power_data_source import PowerDataSource
 from backend.app.services.aggregator import Aggregator
 from backend.app.services.power_service import PowerDataService

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 
 from backend.app.api.power import parse_iso_datetime
-from backend.app.models.power import PowerSlot
+from backend.app.models.domain import PowerSlot
 from backend.app.services.aggregator import Aggregator
 from backend.app.services.power_service import PowerDataService
 from backend.tests.test_service_fake import power_service
