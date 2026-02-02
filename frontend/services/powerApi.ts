@@ -1,8 +1,6 @@
 import { PowerRow, VolumeType } from "../types/power";
 
-const API_URL = "http://localhost:3001/power";
-const API_URL_AWS = "https://abcd1234ef.execute-api.eu-west-1.amazonaws.com/Prod/power";
-
+const API_URL = process.env.NEXT_PUBLIC_POWER_API_URL!;
 
 export async function loadPowerData(
   start: string,
