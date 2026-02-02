@@ -33,7 +33,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::863518431982:role/TradingDashboardDeployRole
           role-session-name: github-action-session
-          aws-region: eu-west-1
+          aws-region: us-east-1
 
       - name: Install dependencies for backend
         run: |
