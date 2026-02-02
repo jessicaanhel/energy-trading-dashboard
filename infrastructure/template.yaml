@@ -57,7 +57,7 @@ Resources:
   PowerApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambda/handler.lambda_handler
+      Handler: backend/app/api/api_lambda.lambda_handler
       Environment:
         Variables:
           STAGE: !Ref Stage
@@ -76,7 +76,7 @@ Resources:
   PowerCsvSyncFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambda/etl_lambda_handler.lambda_handler
+      Handler: backend/app/api/etl_lambda_handler.lambda_handler
       Timeout: 300
       Environment:
         Variables:
