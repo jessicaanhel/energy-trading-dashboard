@@ -46,14 +46,21 @@ The architecture is designed to be scalable, maintainable, and cost-efficient.
 
 ---
 ## Run App
-
+* Backend:
 ```
 uvicorn backend.app.main:app --reload --port 3001
 ```
-&
+* Frontend for local development:
 ```
 cd frontend
-frontend npm run dev
+npm run dev
+```
+
+* Frontend for production:
+```
+cd frontend
+npm run build
+npm run start
 ```
 ---
 
