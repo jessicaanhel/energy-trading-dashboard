@@ -7,7 +7,7 @@ on:
       - dev
     paths:
       - 'infrastructure/template.yaml'
-      - 'backend/lambda/**'
+      - 'backend/**'
       - 'frontend/**'
       - 'samconfig.toml'
 
