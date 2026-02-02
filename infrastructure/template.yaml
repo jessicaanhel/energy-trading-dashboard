@@ -1,11 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Power Aggregator API
+Description: Trading Dashboard API
 
 Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 30
   Api:
     Auth:
       DefaultAuthorizer: AWS_IAM
+
 
 Parameters:
   Stage:
@@ -22,19 +26,46 @@ Parameters:
     Default: /config/trading-dashboard/github-user
 
 Resources:
+  ParkInfoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: park_info
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: park_name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: park_name
+          KeyType: HASH
+
+  PowerSlotsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: power_slots
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
   PowerApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Runtime: python3.11
-      Handler: lambda/handler.lambda_handler
+      Handler: backend/app/api/api_lambda.lambda_handler
       Environment:
         Variables:
           STAGE: !Ref Stage
-          POWER_TABLE_NAME: PowerTable
+          POWER_TABLE_NAME: !Ref PowerSlotsTable
       Policies:
         - AWSLambdaBasicExecutionRole
         - DynamoDBReadPolicy:
-            TableName: PowerTable
+            TableName: !Ref PowerSlotsTable
       Events:
         GetPowerData:
           Type: Api
@@ -42,7 +73,28 @@ Resources:
             Path: /power
             Method: post
 
+  PowerCsvSyncFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: backend/app/api/etl_lambda_handler.lambda_handler
+      Timeout: 300
+      Environment:
+        Variables:
+          POWER_TABLE_NAME: !Ref PowerSlotsTable
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBWritePolicy:
+            TableName: !Ref PowerSlotsTable
+      Events:
+        HourlySync:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 * * * ? *)
+            Name: power-csv-sync-hourly
+            Description: Hourly CSV to DynamoDB sync
+            Enabled: true
+
 Outputs:
   PowerApiUrl:
-    Description: "API Gateway endpoint URL for Power Aggregator"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/power"
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/power"
