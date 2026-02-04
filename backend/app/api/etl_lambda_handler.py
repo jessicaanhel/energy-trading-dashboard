@@ -1,4 +1,4 @@
-from backend.app.data_sources.sync_csv_to_dynamo import sync_csv_to_dynamo
+from backend.app.api.sync_csv_to_dynamo import sync_csv_to_dynamo
 
 
 def lambda_handler(event, context):
