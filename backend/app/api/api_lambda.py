@@ -1,5 +1,6 @@
 import json
 import os
+from zoneinfo import ZoneInfo
 
 from backend.app.api.power import parse_iso_datetime
 from backend.app.data_sources.dynamo_data_source import DynamoDataSource
@@ -40,13 +41,21 @@ def lambda_handler(event, context):
 
     slots = service.get_slots(start_dt, end_dt)
 
+    parks = data_source.load_parks()
+    timezones = {p.park_name: p.timezone for p in parks}
+
     if req.park != "ALL":
-        slots = [slot for slot in slots if s.park_name == req.park]
+        slots = [slot for slot in slots if slot.park_name == req.park]
 
     if req.volume == "average_per_hour":
         aggregated = Aggregator.average_mw_per_hour(slots)
     elif req.volume == "total_per_hour":
         aggregated = Aggregator.total_mw_by_energy_type(slots)
+
+    for slot in aggregated:
+        park_tz = timezones.get(slot.park_name, "UTC")
+
+        slot.timestamp = slot.timestamp.astimezone(ZoneInfo(park_tz)).isoformat()
 
     response = format_production_data(aggregated)
 

@@ -1,3 +1,5 @@
+import logging
+
 from backend.app.data_sources.csv_data_source import CsvDataSource
 from backend.app.data_sources.dynamo_data_source import DynamoDataSource
 from datetime import datetime, timedelta
@@ -12,11 +14,17 @@ def sync_csv_to_dynamo():
     parks = csv_source.load_parks()
     slots = csv_source.load_slots(start, now)
 
+    timezone = {park.park_name: park.timezone for park in parks}
     for park in parks:
         dynamo.save_park(park)
 
     for slot in slots:
-        dynamo.save_slot(slot)
+        if slot.park_name in timezone:
+            local_timezone = timezone[slot.park_name]
+        else:
+            logging.info(f"Error: {slot.park_name} is missing from the timezone table!")
+            raise ValueError("Invalid Park Name")
+        dynamo.save_slot(slot, local_timezone)
 
 if __name__ == "__main__":
     sync_csv_to_dynamo()
