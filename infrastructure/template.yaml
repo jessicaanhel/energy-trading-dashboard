@@ -26,18 +26,6 @@ Parameters:
     Default: /config/trading-dashboard/github-user
 
 Resources:
-  ParkInfoTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: park_info
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: park_name
-          AttributeType: S
-      KeySchema:
-        - AttributeName: park_name
-          KeyType: HASH
-
   PowerSlotsTable:
     Type: AWS::DynamoDB::Table
     Properties:

@@ -1,3 +1,5 @@
+from zoneinfo import ZoneInfo
+
 import boto3
 from boto3.dynamodb.conditions import Key
 from datetime import datetime
@@ -5,6 +7,7 @@ from typing import Dict, List
 
 from backend.app.data_sources.power_data_source import PowerDataSource
 from backend.app.models.domain import PowerSlot, ParkInfo, EnergyType
+from backend.app.utils import local_to_utc
 
 
 class DynamoDataSource(PowerDataSource):
@@ -29,7 +32,7 @@ class DynamoDataSource(PowerDataSource):
 
     def load_slots(self, start: datetime, end: datetime) -> List[PowerSlot]:
         parks_list = self.load_parks()
-        park_map: Dict[str, ParkInfo] = {p.park_name: p for p in parks_list}  # scalable lookup
+        park_map: Dict[str, ParkInfo] = {park.park_name: park for park in parks_list}
 
         slots: List[PowerSlot] = []
 
@@ -44,9 +47,12 @@ class DynamoDataSource(PowerDataSource):
                 )
 
                 for item in resp.get("Items", []):
+                    utc_datetime = datetime.fromisoformat(item["timestamp_utc"])
+                    local_datetime = utc_datetime.astimezone(ZoneInfo(park.timezone))
+
                     slots.append(PowerSlot(
                         park_name=park_name,
-                        timestamp=datetime.fromisoformat(item["timestamp_utc"]),
+                        timestamp=local_datetime,
                         mw=float(item["mw"]),
                         energy_type=park.energy_type
                     ))
@@ -69,14 +75,16 @@ class DynamoDataSource(PowerDataSource):
             }
         )
 
-    def save_slot(self, slot: PowerSlot):
+    def save_slot(self, slot: PowerSlot, local_timezone):
+        utc_datetime = local_to_utc(slot.timestamp, local_timezone)
+        utc_iso = utc_datetime.strftime('%Y-%m-%dT%H:%M:%S')
         self.table.put_item(
             Item={
                 "pk": f"PARK#{slot.park_name}",
                 "sk": f"SLOT#{slot.timestamp.isoformat()}",
                 "item_type": "SLOT",
                 "park_name": slot.park_name,
-                "timestamp_utc": slot.timestamp.isoformat(),
+                "timestamp_utc": utc_iso,
                 "mw": slot.mw
             }
         )

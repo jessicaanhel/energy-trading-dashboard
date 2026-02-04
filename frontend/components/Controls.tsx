@@ -37,8 +37,11 @@ export default function Controls({
         <label>Park: </label>
         <select value={park} onChange={(e) => setPark(e.target.value)}>
           <option value="ALL">All parks</option>
-          <option value="WIND_PARK_1">Wind park 1</option>
-          <option value="SOLAR_PARK_1">Solar park 1</option>
+          <option value="Bemmel">Bemmel</option>
+          <option value="Netterden">Netterden</option>
+          <option value="Stadskanaal">Stadskanaal</option>
+          <option value="Windskanaal">Windskanaal</option>
+          <option value="Zwartenbergseweg">Zwartenbergseweg</option>
         </select>
       </div>
 

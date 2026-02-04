@@ -50,7 +50,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>Energy Production Dashboard</h1>
+      <h1>Trading Dashboard</h1>
 
       {/* Controls */}
       <Controls
@@ -68,7 +68,7 @@ export default function Home() {
         {loading ? "Loading..." : "Load Data"}
       </button>
 
-      {/* Summary Cards */}
+      {/* Summary Blocks */}
       <div style={{ display: "flex", gap: 20, marginBottom: 20, flexWrap: "wrap" }}>
         <div style={{ flex: 1, minWidth: 150, padding: 10, border: "1px solid #ccc", borderRadius: 8 }}>
           <h4>Total Wind MW</h4>
