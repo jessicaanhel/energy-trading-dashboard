@@ -1,8 +1,10 @@
 import json
+import logging
 import os
 from zoneinfo import ZoneInfo
 
 from backend.app.api.power import parse_iso_datetime
+from backend.app.api.sync_csv_to_dynamo import get_park_time_zone
 from backend.app.data_sources.dynamo_data_source import DynamoDataSource
 from backend.app.models.api import PowerRequest
 from backend.app.services.aggregator import Aggregator
@@ -17,7 +19,7 @@ def lambda_handler(event, context):
     {
         "start": "2026-01-27T00:00:00",
         "end": "2026-01-27T23:00:00",
-        "park": "ALL",
+        "park": "ALL" | "Bemmel" | "Netterden" | "Stadskanaal" | "Windskanaal" | "Zwartenbergseweg",
         "volume": "average_per_hour"
     }
     """
@@ -42,7 +44,7 @@ def lambda_handler(event, context):
     slots = service.get_slots(start_dt, end_dt)
 
     parks = data_source.load_parks()
-    timezones = {p.park_name: p.timezone for p in parks}
+    timezones = {park.park_name: park.timezone for park in parks}
 
     if req.park != "ALL":
         slots = [slot for slot in slots if slot.park_name == req.park]
@@ -53,9 +55,8 @@ def lambda_handler(event, context):
         aggregated = Aggregator.total_mw_by_energy_type(slots)
 
     for slot in aggregated:
-        park_tz = timezones.get(slot.park_name, "UTC")
-
-        slot.timestamp = slot.timestamp.astimezone(ZoneInfo(park_tz)).isoformat()
+        local_timezone = get_park_time_zone(slot, timezones)
+        slot.timestamp = slot.timestamp.astimezone(ZoneInfo(local_timezone)).isoformat()
 
     response = format_production_data(aggregated)
 
