@@ -14,13 +14,13 @@ def sync_csv_to_dynamo():
     parks = csv_source.load_parks()
     slots = csv_source.load_slots(start, now)
 
-    timezone = {park.park_name: park.timezone for park in parks}
+    timezones = {park.park_name: park.timezone for park in parks}
     for park in parks:
         dynamo.save_park(park)
 
     for slot in slots:
-        if slot.park_name in timezone:
-            local_timezone = timezone[slot.park_name]
+        if slot.park_name in timezones:
+            local_timezone = timezones[slot.park_name]
         else:
             logging.info(f"Error: {slot.park_name} is missing from the timezone table!")
             raise ValueError("Invalid Park Name")
