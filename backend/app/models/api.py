@@ -6,4 +6,4 @@ class PowerRequest(BaseModel):
     start: str
     end: str
     volume: str
-    park: str = "ALL"
+    park: str
